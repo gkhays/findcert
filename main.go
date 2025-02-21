@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"org.gkh/certfinder/report"
 	"org.gkh/certfinder/ui"
@@ -20,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("%s\n", Version)
+		fmt.Printf("%s (%s on %s/%s; %s)\n", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH, runtime.Compiler)
 		os.Exit(0)
 	}
 
