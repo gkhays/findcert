@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"org.gkh/certfinder/report"
-	"org.gkh/certfinder/ui"
+	"org.gkh/findcert/cli"
+	"org.gkh/findcert/ui"
 )
 
 func main() {
@@ -36,5 +36,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	report.Execute(absPath, *outputFile)
+	cli.Execute(absPath, *outputFile)
 }

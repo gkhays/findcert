@@ -1,4 +1,4 @@
-package report
+package cli
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"org.gkh/certfinder/ui"
+	"org.gkh/findcert/ui"
 )
 
 // Certificate file extensions to search for
