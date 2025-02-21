@@ -1,0 +1,7 @@
+FROM golang:1.22-alpine
+
+RUN apk add --no-cache make git
+RUN mkdir -p /go/src/github.com/gkh/findcert && \
+  ln -s /go/src/github.com/gkh/findcert /app
+
+WORKDIR /app
