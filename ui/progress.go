@@ -10,7 +10,7 @@ var spinnerChars = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "�
 
 type Spinner struct {
 	stop    chan struct{}
-	stopped bool
+	Stopped bool
 	sync.Mutex
 }
 
@@ -22,7 +22,7 @@ func NewSpinner() *Spinner {
 
 func (s *Spinner) Start(message string) {
 	s.Lock()
-	if s.stopped {
+	if s.Stopped {
 		s.Unlock()
 		return
 	}
@@ -31,7 +31,7 @@ func (s *Spinner) Start(message string) {
 	go func() {
 		for i := 0; ; i = (i + 1) % len(spinnerChars) {
 			s.Lock()
-			if s.stopped {
+			if s.Stopped {
 				s.Unlock()
 				return
 			}
@@ -53,10 +53,10 @@ func (s *Spinner) Start(message string) {
 func (s *Spinner) Stop() {
 	s.Lock()
 	defer s.Unlock()
-	if s.stopped {
+	if s.Stopped {
 		return
 	}
-	s.stopped = true
+	s.Stopped = true
 	close(s.stop)
 	// Clear the line
 	fmt.Print("\r\033[K")
