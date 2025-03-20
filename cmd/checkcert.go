@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-type FIPSComplianceResult struct {
+type FIPSResult struct {
 	IsCompliant bool
 	Reasons     []string
 }
 
 // Is the provided X.509 certificate FIPS 140-3 compliant?
-func IsCertificateFIPSCompliant(certPath string) (*FIPSComplianceResult, error) {
+func IsFIPSCompliant(certPath string) (*FIPSResult, error) {
 	// Read certificate file
 	certData, err := os.ReadFile(certPath)
 	if err != nil {
@@ -35,13 +35,13 @@ func IsCertificateFIPSCompliant(certPath string) (*FIPSComplianceResult, error) 
 		return nil, fmt.Errorf("failed to parse certificate: %w", err)
 	}
 
-	result := &FIPSComplianceResult{
+	result := &FIPSResult{
 		IsCompliant: true,
 		Reasons:     []string{},
 	}
 
 	// Check signature algorithm
-	if !isFIPSCompliantSignatureAlgorithm(cert.SignatureAlgorithm) {
+	if !isFIPSSignatureAlgorithm(cert.SignatureAlgorithm) {
 		result.IsCompliant = false
 		result.Reasons = append(result.Reasons,
 			fmt.Sprintf("Signature algorithm %v is not FIPS 140-3 compliant", cert.SignatureAlgorithm))
@@ -54,7 +54,7 @@ func IsCertificateFIPSCompliant(certPath string) (*FIPSComplianceResult, error) 
 	}
 
 	// Check certificate expiration
-	if !isValidCertificateExpiration(cert) {
+	if !hasExpired(cert) {
 		result.IsCompliant = false
 		result.Reasons = append(result.Reasons, "Certificate is expired or not yet valid")
 	}
@@ -63,7 +63,7 @@ func IsCertificateFIPSCompliant(certPath string) (*FIPSComplianceResult, error) 
 }
 
 // Is the signature algorithm is FIPS 140-3 compliant?
-func isFIPSCompliantSignatureAlgorithm(sigAlg x509.SignatureAlgorithm) bool {
+func isFIPSSignatureAlgorithm(sigAlg x509.SignatureAlgorithm) bool {
 	// FIPS 140-3 compliant signature algorithms
 	compliantAlgorithms := map[x509.SignatureAlgorithm]bool{
 		x509.SHA256WithRSA:   true,
@@ -96,13 +96,12 @@ func isFIPSCompliantPublicKey(pubKey interface{}) bool {
 	}
 }
 
-// Has the certificate is expired or otherwise invalid?
-func isValidCertificateExpiration(cert *x509.Certificate) bool {
+// Has the certificate is expired?
+func hasExpired(cert *x509.Certificate) bool {
 	now := time.Now()
 	return now.After(cert.NotBefore) && now.Before(cert.NotAfter)
 }
 
-// GetCertificateExpirationInfo returns detailed information about certificate validity period
 func GetCertificateExpirationInfo(cert *x509.Certificate) string {
 	now := time.Now()
 
@@ -121,8 +120,8 @@ func GetCertificateExpirationInfo(cert *x509.Certificate) string {
 	}
 }
 
-// PrintFIPSComplianceResult prints the FIPS compliance check result
-func PrintFIPSComplianceResult(result *FIPSComplianceResult, cert *x509.Certificate) {
+// Prints the FIPS compliance check result
+func PrintFIPSResult(result *FIPSResult, cert *x509.Certificate) {
 	if result.IsCompliant {
 		fmt.Println("Certificate is FIPS 140-3 compliant.")
 	} else {

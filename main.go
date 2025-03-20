@@ -53,7 +53,7 @@ func main() {
 	}
 
 	if len(*checkCert) > 0 {
-		result, err := cmd.IsCertificateFIPSCompliant(*checkCert)
+		result, err := cmd.IsFIPSCompliant(*checkCert)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
@@ -64,7 +64,7 @@ func main() {
 		block, _ := pem.Decode(certData)
 		cert, _ := x509.ParseCertificate(block.Bytes)
 
-		cmd.PrintFIPSComplianceResult(result, cert)
+		cmd.PrintFIPSResult(result, cert)
 		os.Exit(0)
 	}
 
