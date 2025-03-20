@@ -24,3 +24,6 @@ go.work.sum
 
 # IDE
 .vscode/
+
+# Output file
+results.json

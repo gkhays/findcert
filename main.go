@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/x509"
+	"encoding/pem"
 	"flag"
 	"fmt"
 	"os"
@@ -20,6 +22,7 @@ func main() {
 	outputFile := flag.String("output", "results.json", "Output JSON file path")
 	showVersion := flag.Bool("version", false, "Show version information")
 	listNoExt := flag.Bool("noext", false, "List files with no extension")
+	checkCert := flag.String("cert-path", ".", "Certificate to verify")
 
 	flag.Parse()
 
@@ -47,6 +50,22 @@ func main() {
 			}
 			os.Exit(0)
 		}
+	}
+
+	if len(*checkCert) > 0 {
+		result, err := cmd.IsCertificateFIPSCompliant(*checkCert)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Re-parse certificate for expiration info display
+		certData, _ := os.ReadFile(*checkCert)
+		block, _ := pem.Decode(certData)
+		cert, _ := x509.ParseCertificate(block.Bytes)
+
+		cmd.PrintFIPSComplianceResult(result, cert)
+		os.Exit(0)
 	}
 
 	absPath, err := filepath.Abs(*searchPath)
